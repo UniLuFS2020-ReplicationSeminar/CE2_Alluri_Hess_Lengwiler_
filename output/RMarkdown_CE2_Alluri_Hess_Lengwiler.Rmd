@@ -1,0 +1,40 @@
+---
+title: "RMarkdown_CE2_Alluri_Hess_Lengwiler"
+subtitle: "CE2"
+author: "Silvan H., Vishal A., Kerim L."
+date: "2024-04-29"
+output: html_document:
+  toc: true
+  toc_float: true
+  theme:united
+---
+
+# Title / Research Question
+
+## Hypothesis
+
+## Data, Operationalisation and Methods
+
+### Data
+
+```{r}
+
+```
+
+### Operationalisation
+```{r}
+
+```
+
+### Methods
+```{r}
+
+```
+
+##Results
+```{r}
+
+```
+
+
+##Discussion
