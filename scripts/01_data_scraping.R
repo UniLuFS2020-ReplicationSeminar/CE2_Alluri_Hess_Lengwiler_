@@ -7,7 +7,7 @@ base_url <- "https://content.guardianapis.com/search"
 topic <- "COVID-19"
 api_key <- Sys.getenv("Guardian_API_KEY")# Create Renviron text file in your project directory 
                                          # and type the following line:
-                                         # V_API_KEY="enter-your-registered-api-key-here"
+                                         # Guardian_API_KEY="enter-your-registered-api-key-here"
                                          # We have "git-ignored" this file 
    
 #GET request 
