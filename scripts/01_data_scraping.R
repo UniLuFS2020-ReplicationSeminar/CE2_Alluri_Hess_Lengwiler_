@@ -10,35 +10,41 @@ api_key <- Sys.getenv("Guardian_API_KEY")# Create Renviron text file in your pro
                                          # and type the following line:
                                          # Guardian_API_KEY="enter-your-registered-api-key-here"
                                          # We have "git-ignored" this file 
-   
+
+pages <- list()  
+
 #GET request 
  for (i in 1:50) {
     api_response1 <- GET(url = base_url, 
                          query = list(q = topic,
                                       `api-key` = api_key,
-                                      page = i,
-                                      `page-size` = 50)
+                                      page = i,         #To iterate and get results from page 1 to 50
+                                      `page-size` = 50) #50 articles per page
                          )
     #Do not mind the error
     
     # Check the response status and output results
     # Article Titles and URL's 
     if (status_code(api_response1) == 200) {
-      content_data <- content(api_response1, "parsed") 
-      print(content_data)
+      content_data <- content(api_response1, "parsed")
+      if (!is.null(content_data$response$results)) {
+        # Iterating and adding each page results to the pages list
+        pages <- append(pages, content_data$response$results)
+      }
     } else {
       print(paste("Failed with status:", status_code(api_response1)))
     }
  }
- 
+
+#Converting matrix-list/nested structure into a dataframe
+pages_flat <- bind_rows(pages)
 
 #Creating a data frame by extracting necessary info
-# View the list heirarchy by clicking on content_data-> response -> results
-dat <- tibble(
-  id = map_chr(content_data$response$results, 1),   #Extract id element      
-  section_name = map_chr(content_data$response$results, 4),   #Extract sectionNname element
-  publish_date = map_chr(content_data$response$results, 5),   #webPublicationDate
-  title = map_chr(content_data$response$results, 6),          #webTitle
-  web_url = map_chr(content_data$response$results, 7)         #webURL
-)
+dat <- pages_flat %>% 
+  select(id_endpoint = id,
+         section_name = sectionName,
+         publish_date = webPublicationDate,
+         title = webTitle)
+
+
 
