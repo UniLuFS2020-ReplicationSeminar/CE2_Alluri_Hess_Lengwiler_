@@ -4,3 +4,10 @@
 .Ruserdata
 .data_original
 .Renviron
+*.csv
+*.xls
+*.xlsx
+*.json
+*.RData
+*.rda
+*.rds
