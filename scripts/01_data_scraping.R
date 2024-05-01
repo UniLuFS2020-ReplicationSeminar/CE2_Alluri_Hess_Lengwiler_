@@ -1,6 +1,7 @@
 
 #Load library
 library(httr)
+library(tidyverse)
 
 # Define base URL and parameters 
 base_url <- "https://content.guardianapis.com/search"
@@ -18,7 +19,7 @@ api_response1 <- GET(url = base_url,
 #Do not mind the error
 
 # Check the response status and output results
-# Article Titles and URL's
+# Article Titles and URL's 
 if (status_code(api_response1) == 200) {
   content_data <- content(api_response1, "parsed") 
   print(content_data)
@@ -27,14 +28,12 @@ if (status_code(api_response1) == 200) {
 }
 
 
-if (status_code(api_response1) == 200) {
-  content_data <- content(api_response1, "parsed") 
-  articles <- data.frame(
-    Title = sapply(content_data, function(x) x$webTitle),
-    URL = sapply(content_data, function(x) x$webUrl),
-    Published = sapply(content_data, function(x) x$webPublicationDate)
-  )
-  print(articles)
-} else {
-  print(paste("Failed with status:", status_code(api_response)))
-}
+#Creating a data frame by extracting necessary info
+# View the list heirarchy by clicking on content_data-> response -> results
+dat <- tibble(
+  id = map_chr(content_data$response$results, 1),   #Extract id element      
+  section_name = map_chr(content_data$response$results, 4),   #Extract sectionNname element
+  publish_date = map_chr(content_data$response$results, 5),   #webPublicationDate
+  title = map_chr(content_data$response$results, 6),          #webTitle
+  web_url = map_chr(content_data$response$results, 7)         #webURL
+)
