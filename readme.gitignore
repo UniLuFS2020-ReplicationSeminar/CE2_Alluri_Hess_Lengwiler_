@@ -1,8 +1,0 @@
-# Ignore Datasets with the following extensions
-*.csv
-*.xls
-*.xlsx
-*.json
-*.RData
-*.rda
-*.rds
