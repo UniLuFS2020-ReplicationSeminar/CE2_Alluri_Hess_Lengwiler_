@@ -27,7 +27,8 @@ pages <- list()
     # Article Titles and URL's 
     if (status_code(api_response1) == 200) {
       content_data <- content(api_response1, "parsed")
-      if (!is.null(content_data$response$results)) {
+      if (!is.null(content_data$response$results)) {   #Ensuring requested data is not null to make  
+                                                       #sure that storing and accessing it is not problematic  
         # Iterating and adding each page results to the pages list
         pages <- append(pages, content_data$response$results)
       }
