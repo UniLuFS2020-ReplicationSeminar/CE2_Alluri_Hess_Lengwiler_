@@ -1,40 +1,126 @@
 ---
-title: "RMarkdown_CE2_Alluri_Hess_Lengwiler"
-subtitle: "CE2"
-author: "Silvan H., Vishal A., Kerim L."
-date: "2024-04-29"
-output: html_document:
+title: "Data Mining using R"
+subtitle: "Class Exercise 2"
+authors: "Silvan H., Vishal A. and Kerim L."
+date: "03.05.2024"
+output: 
+  html_document:
   toc: true
-  toc_float: true
-  theme:united
+toc_float: true
+theme: united
 ---
 
 # Title / Research Question
 
-## Hypothesis
+## Hypothesis / Research Interest
+
+COMMENT HERE
 
 ## Data, Operationalisation and Methods
 
+COMMENT HERE
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Setup libraries
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+install.packages("httr")
+install.packages("tidyverse")
+install.packages("rvest")
+library(httr)
+library(tidyverse)
+library(rvest)
+```
+
+
+
 ### Data
 
-```{r}
+COMMENT HERE
 
+```{r}
+# Define base URL and parameters
+base_url <- "https://content.guardianapis.com/search"
+topic <- "covid-19 AND travel restrictions" 
+
+# Set API-key
+api_key <- Sys.getenv("Guardian_API_KEY") # Key must be stored in .Renviron file to prevent publication of key 
+
+if (api_key == "") {
+  stop("API key is not set. Please ensure your .Renviron file is configured correctly.") #Checks for API key and gives error message if not
+}
+
+pages <- list()  
+
+# GET request
+ for (i in 1:50) {
+    api_response1 <- GET(url = base_url, 
+                         query = list(q = topic,
+                                      `api-key` = api_key,
+                                      page = i,         
+                                      `page-size` = 50))
+    
+    if (status_code(api_response1) == 200) {
+      content_data <- content(api_response1, "parsed")
+      if (!is.null(content_data$response$results)) {   
+        pages <- append(pages, content_data$response$results)
+      }
+    } else {
+      print(paste("Failed with status:", status_code(api_response1)))
+      break #Breaks the loop if status code is not 200
+    }
+ }
+
+# Converting matrix-list/nested structure into a dataframe
+pages_flat <- bind_rows(pages)
+
+# Creating a data frame by extracting information of interest
+dat <- pages_flat %>% 
+  select(id_endpoint = id,
+         section_name = sectionName,
+         publish_date = webPublicationDate,
+         title = webTitle)
+
+# Save the data locally as a csv file
+write_csv(dat, "../data_original/guardian_covid_travel.csv")
 ```
 
 ### Operationalisation
-```{r}
 
+COMMENT HERE 
+
+```{r}
+# load the data
+dat <- read_csv("../data_original/guardian_covid_travel.csv")
+
+# delete the variable id_endpoint
+dat$id_endpoint <- NULL
+
+#create a new variable month published based on publish_date
+dat$month_published <- as.Date(dat$publish_date, format = "%Y-%m-%d") %>% format("%Y-%m")
+
+# save the processed data
+write_csv(dat, "../data_processed/guardian_covid_travel.csv")
 ```
 
 ### Methods
-```{r}
 
-```
+COMMENT HERE
 
 ##Results
-```{r}
 
+COMMENT HERE
+
+```{r}
+dat %>% 
+  ggplot(aes(x = month_published)) +
+  geom_bar() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 
 ##Discussion
+
+COMMENT HERE
