@@ -1,0 +1,126 @@
+---
+title: "Data Mining using R"
+subtitle: "Class Exercise 2 by Silvan H., Vishal A. and Kerim L."
+authors: "Silvan H., Vishal A. and Kerim L."
+date: "03.05.2024"
+output: 
+  html_document:
+  toc: true
+toc_float: true
+theme: united
+---
+
+# How did media coverage of travel restrictions evolve during the COVID-19 pandemic?
+
+## Topic of Interest
+
+Particularly at the beginning of the COVID-19 pandemic, when no vaccines were available, physical interventions such as face masks, social distancing, lockdowns and travel restrictions were the main measures used to mitigate the effects of the COVID-19 pandemic. As such measures are effective when there is a high level of compliance within society, information about the rules and guidelines in place is required.
+
+We are now interested in how media coverage regarding one of these physical interventions - travel restrictions - has evolved in a quantitative way over time. 
+
+## Data, Operationalisation and Methods
+
+To investigate our subject of interest, we made use of the Guardian API. The Guardian API is a web service that allows access to over 2 million pieces of content (articles, video or audio) dating back to 1999.
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Setup libraries
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+install.packages("httr")
+install.packages("tidyverse")
+install.packages("rvest")
+install.packages("rmarkdown")
+library(httr)
+library(tidyverse)
+library(rvest)
+library(rmarkdown)
+```
+
+### Data
+We first scraped the Guardian API for all articles that contain the terms "covid-19" and "travel restrictions", thereby obtaining 1050 articles.
+
+```{r}
+# Define base URL and parameters
+base_url <- "https://content.guardianapis.com/search"
+topic <- "covid-19 AND travel restrictions" 
+
+# Set API-key
+api_key <- Sys.getenv("Guardian_API_KEY") # Key must be stored in .Renviron file to prevent publication of key 
+
+if (api_key == "") {
+  stop("API key is not set. Please ensure your .Renviron file is configured correctly.") #Checks for API key and gives error message if not
+}
+
+pages <- list()  
+
+# GET request
+ for (i in 1:50) {
+    api_response1 <- GET(url = base_url, 
+                         query = list(q = topic,
+                                      `api-key` = api_key,
+                                      page = i,         
+                                      `page-size` = 50))
+    
+    if (status_code(api_response1) == 200) {
+      content_data <- content(api_response1, "parsed")
+      if (!is.null(content_data$response$results)) {   
+        pages <- append(pages, content_data$response$results)
+      }
+    } else {
+      print(paste("Failed with status:", status_code(api_response1)))
+      break #Breaks the loop if status code is not 200
+    }
+ }
+
+# Converting matrix-list/nested structure into a dataframe
+pages_flat <- bind_rows(pages)
+
+# Creating a data frame by extracting information of interest
+dat <- pages_flat %>% 
+  select(id_endpoint = id,
+         section_name = sectionName,
+         publish_date = webPublicationDate,
+         title = webTitle)
+
+# Save the data locally as a csv file
+write_csv(dat, "../data_original/guardian_covid_travel.csv")
+```
+
+### Operationalisation
+
+To investigate how media coverage of travel restrictions evolved over time, we created a variable "month_published" to cluster articles by month and year of publication. 
+
+```{r}
+# load the data
+dat <- read_csv("../data_original/guardian_covid_travel.csv")
+
+# delete the variable id_endpoint
+dat$id_endpoint <- NULL
+
+#create a new variable month published based on publish_date
+dat$month_published <- as.Date(dat$publish_date, format = "%Y-%m-%d") %>% format("%Y-%m")
+
+# save the processed data
+write_csv(dat, "../data_processed/guardian_covid_travel.csv")
+```
+
+### Methods
+We then visualized the data by creating a bar chart that shows the number of articles covering "covid-19" and "travel restrictions" per month.
+ 
+## Results
+
+Not surprising, the number of articles covering "covid-19" and "travel restrictions" increased  thought the years 2020 and 2021 with a peak at the end of 2021 when physical interventions were still in place due to the lack of vaccines. To our surprise, there is a second peak in the number of articles covering "covid-19" and "travel restrictions" that started at the beginning of 2024 - long after the pandemic was declared over - and could be still ongoing.
+
+```{r}
+dat %>% 
+  ggplot(aes(x = month_published)) +
+  geom_bar() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+## Discussion
+
+We do not know what caused the second peak in the number of articles covering "covid-19" and "travel restrictions" in 2024. This could be an interesting topic of interest in a follow up project that focussed more on the qualitiative content of the articles instead of the quantitative aspect. 
