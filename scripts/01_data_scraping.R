@@ -1,4 +1,3 @@
-
 #Load library
 library(httr)
 library(tidyverse)
@@ -11,6 +10,10 @@ api_key <- Sys.getenv("Guardian_API_KEY") # Create Renviron text file in your pr
                                           # and type the following line:
                                           # Guardian_API_KEY="enter-your-registered-api-key-here"
                                           # We have "git-ignored" this file 
+
+if (api_key == "") {
+  stop("API key is not set. Please ensure your .Renviron file is configured correctly.") #Checks for API key and gives error message if not
+}
 
 pages <- list()  
 
@@ -35,6 +38,7 @@ pages <- list()
       }
     } else {
       print(paste("Failed with status:", status_code(api_response1)))
+      break #Breaks the loop if status code is not 200
     }
  }
 
@@ -49,5 +53,4 @@ dat <- pages_flat %>%
          title = webTitle)
 
 #save the dataframe as a csv file
-write_csv(dat, "data_original/guardian_covid_travel.csv")
-
+write_csv(dat, "../data_original/guardian_covid_travel.csv")
