@@ -1,4 +1,4 @@
-# CE2_Alluri_Hess_Lengwiler: Repository Structure, Project Information and Project Findings
+# CE2_Alluri_Hess_Lengwiler 
 
 ## Repository Structure
 The repository is structured as follows:
