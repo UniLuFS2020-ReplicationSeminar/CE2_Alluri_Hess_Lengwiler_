@@ -5,11 +5,12 @@ library(tidyverse)
 
 # Define base URL and parameters 
 base_url <- "https://content.guardianapis.com/search"
-topic <- "covid"
-api_key <- Sys.getenv("Guardian_API_KEY")# Create Renviron text file in your project directory 
-                                         # and type the following line:
-                                         # Guardian_API_KEY="enter-your-registered-api-key-here"
-                                         # We have "git-ignored" this file 
+topic <- "covid-19 AND travel restrictions" # You can change this to any topic you want to search for
+                                            # just use AND OR or NOT operators to refine your search
+api_key <- Sys.getenv("Guardian_API_KEY") # Create Renviron text file in your project directory 
+                                          # and type the following line:
+                                          # Guardian_API_KEY="enter-your-registered-api-key-here"
+                                          # We have "git-ignored" this file 
 
 pages <- list()  
 
@@ -47,5 +48,6 @@ dat <- pages_flat %>%
          publish_date = webPublicationDate,
          title = webTitle)
 
-
+#save the dataframe as a csv file
+write_csv(dat, "data_original/guardian_covid_travel.csv")
 
