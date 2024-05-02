@@ -15,7 +15,7 @@ getwd()
 ## Data processing ####
 
 # load the data
-dat <- read_csv("data_original/guardian_covid_travel.csv")
+dat <- read_csv("../data_original/guardian_covid_travel.csv")
 
 # delete the variable id_endpoint
 dat$id_endpoint <- NULL
@@ -24,7 +24,7 @@ dat$id_endpoint <- NULL
 dat$month_published <- as.Date(dat$publish_date, format = "%Y-%m-%d") %>% format("%Y-%m")
 
 # save the processed data
-write_csv(dat, "data_processed/guardian_covid_travel.csv")
+write_csv(dat, "../data_processed/guardian_covid_travel.csv")
 
 ## Data visualization ####
 
@@ -36,7 +36,7 @@ dat %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 # save the plot
-ggsave("output/plot_month_published.png")
+ggsave("../output/plot_month_published.png")
 
 # print out how many times a section occurs in the variable section_name
 dat %>% 
