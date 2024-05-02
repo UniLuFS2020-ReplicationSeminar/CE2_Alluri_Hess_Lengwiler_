@@ -1,6 +1,7 @@
 #Load library
 library(httr)
 library(tidyverse)
+getwd()
 
 # Define base URL and parameters 
 base_url <- "https://content.guardianapis.com/search"
@@ -53,4 +54,4 @@ dat <- pages_flat %>%
          title = webTitle)
 
 #save the dataframe as a csv file
-write_csv(dat, "../data_original/guardian_covid_travel.csv")
+write_csv(dat, "data_original/guardian_covid_travel.csv")
